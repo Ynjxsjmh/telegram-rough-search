@@ -72,5 +72,17 @@ async def main():
                 print(dialog.title, message.date)
                 print(message.message)
 
+            if isinstance(message.media, telethon.tl.types.MessageMediaWebPage):
+                webpage = message.media.webpage
+
+                if isinstance(webpage, telethon.tl.types.WebPageEmpty):
+                    continue
+
+                if webpage.title and args.search_text in webpage.title \
+                   or webpage.description and args.search_text in webpage.description:
+                    print(dialog.title, message.date)
+                    print(message.message)
+
+
 client.start()
 client.loop.run_until_complete(main())
