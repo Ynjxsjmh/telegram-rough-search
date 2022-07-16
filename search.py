@@ -76,13 +76,13 @@ async def main():
         dialogs_bar.set_description_str(f'Searching in dialog: {dialog.name}')
         entity = dialog.entity
 
-        if dialog.is_channel:
-            limit = args.message_limit_channel
-            if args.skip_channel:
-                continue
-        elif dialog.is_group:
+        if dialog.is_group:
             limit = args.message_limit_group
             if args.skip_group:
+                continue
+        elif dialog.is_channel:
+            limit = args.message_limit_channel
+            if args.skip_channel:
                 continue
         else:
             limit = args.message_limit_user
