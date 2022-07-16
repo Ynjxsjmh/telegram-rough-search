@@ -1,9 +1,9 @@
 import argparse
-import datetime
 import logging
 import telethon
 
 from configparser import ConfigParser
+from datetime import datetime
 from telethon import TelegramClient
 from time import sleep
 from tqdm import tqdm
@@ -52,6 +52,13 @@ def get_args():
                         default=50, type=int,
                         help='Number of messages to be retrieved for user and bot.')
 
+    parser.add_argument('--date_start',
+                        default='', type=str,
+                        help='YYYY-mm-dd format. Messages AFTER to this date will be retrieved. Inclusive.')
+    parser.add_argument('--date_end',
+                        default='', type=str,
+                        help='YYYY-mm-dd format. Messages PREVIOUS to this date will be retrieved. Exclusive.')
+
     args = parser.parse_args()
 
     return args
@@ -82,13 +89,30 @@ async def main():
             if args.skip_user:
                 continue
 
-        messages = await client.get_messages(
-            entity,
-            limit=limit,
-            offset_date=None,     # Offset date (messages previous to this date will be retrieved).
-                                  # If None, from newest message. Exclusive.
-            offset_id=0,          # Offset message ID (only messages previous to the given ID will be retrieved). Exclusive.
-        )
+        if args.date_start or args.date_end:
+            from_date = datetime.strptime(args.date_start, '%Y-%m-%d') if args.date_start else None
+            to_date = datetime.strptime(args.date_end, '%Y-%m-%d')  if args.date_end else None
+
+            pre_first_msg = await client.get_messages(entity, offset_date=from_date, limit=1)
+            pre_first_msg = pre_first_msg[0]
+            last_msg = await client.get_messages(entity, offset_date=to_date, limit=1)
+            last_msg = last_msg[0]
+
+            messages = await client.get_messages(
+                entity,
+                min_id=pre_first_msg.id if from_date else 0, # All the messages with a lower (older) ID or equal to this will be excluded.
+                max_id=last_msg.id if to_date else 0,        # All the messages with a higher (newer) ID or equal to this will be excluded.
+            ) + [last_msg]
+
+        else:
+            messages = await client.get_messages(
+                entity,
+                limit=limit,
+                offset_date=None,     # Offset date (messages previous to this date will be retrieved).
+                # If None, from newest message. Exclusive.
+                offset_id=0,          # Offset message ID (only messages previous to the given ID will be retrieved). Exclusive.
+            )
+
         messages_bar = tqdm(messages, desc='Progress in dialog', leave=False)
 
         for message in messages_bar:
