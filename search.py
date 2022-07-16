@@ -1,5 +1,6 @@
 import argparse
 import datetime
+import logging
 import telethon
 
 from configparser import ConfigParser
@@ -15,6 +16,14 @@ api_id = config['DEFAULT']['api_id']
 api_hash = config['DEFAULT']['api_hash']
 session_name = config['DEFAULT']['session_name']
 client = TelegramClient(session_name, api_id, api_hash)
+
+
+logging.basicConfig(filename='search.log',
+                    filemode='w',
+                    format='%(message)s',
+                    level=logging.INFO)
+
+logger = logging.getLogger()
 
 
 def get_args():
@@ -74,8 +83,8 @@ async def main():
                 continue
 
             if args.search_text in message.message:
-                print(dialog.title, message.date)
-                print(message.message)
+                logger.info(dialog.title + ' ' + message.date.strftime('%Y-%m-%d %H:%M:%S') )
+                logger.info(message.message + '\n')
 
             if isinstance(message.media, telethon.tl.types.MessageMediaWebPage):
                 webpage = message.media.webpage
@@ -85,8 +94,8 @@ async def main():
 
                 if webpage.title and args.search_text in webpage.title \
                    or webpage.description and args.search_text in webpage.description:
-                    print(dialog.title, message.date)
-                    print(message.message)
+                    logger.info(dialog.title + ' ' + message.date.strftime('%Y-%m-%d %H:%M:%S') )
+                    logger.info(message.message + '\n')
 
             messages_bar.update(1)
             sleep(0.005)
