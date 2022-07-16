@@ -4,6 +4,8 @@ import telethon
 
 from configparser import ConfigParser
 from telethon import TelegramClient
+from time import sleep
+from tqdm import tqdm
 
 
 config = ConfigParser()
@@ -42,8 +44,10 @@ async def main():
     dialogs = await client.get_dialogs(
         limit=None,
     )
+    dialogs_bar = tqdm(dialogs, bar_format='{desc} ({n_fmt}/{total_fmt})')
 
-    for dialog in dialogs:
+    for dialog in dialogs_bar:
+        dialogs_bar.set_description_str(f'Searching in dialog: {dialog.name}')
         entity = dialog.entity
 
         if dialog.is_channel:
@@ -63,8 +67,9 @@ async def main():
                                   # If None, from newest message. Exclusive.
             offset_id=0,          # Offset message ID (only messages previous to the given ID will be retrieved). Exclusive.
         )
+        messages_bar = tqdm(messages, desc='Progress in dialog', leave=False)
 
-        for message in messages:
+        for message in messages_bar:
             if not isinstance(message, telethon.tl.patched.Message):
                 continue
 
@@ -83,6 +88,8 @@ async def main():
                     print(dialog.title, message.date)
                     print(message.message)
 
+            messages_bar.update(1)
+            sleep(0.005)
 
 client.start()
 client.loop.run_until_complete(main())
