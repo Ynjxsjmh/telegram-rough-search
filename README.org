@@ -1,0 +1,66 @@
+* Telegram Rough Search
+
+** Usage
+
+#+BEGIN_SRC bash
+$ python search.py --help
+usage: search.py [-h] [--search_text SEARCH_TEXT]
+                 [--skip_channel SKIP_CHANNEL] [--skip_group SKIP_GROUP]
+                 [--skip_user SKIP_USER]
+                 [--message_limit_channel MESSAGE_LIMIT_CHANNEL]
+                 [--message_limit_group MESSAGE_LIMIT_GROUP]
+                 [--message_limit_user MESSAGE_LIMIT_USER]
+                 [--date_start DATE_START] [--date_end DATE_END]
+
+Settings.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --search_text SEARCH_TEXT
+                        Text to be searched in current account
+  --skip_channel SKIP_CHANNEL
+                        Whether to skip channel when search
+  --skip_group SKIP_GROUP
+                        Whether to skip group when search
+  --skip_user SKIP_USER
+                        Whether to skip user and bot when search
+  --message_limit_channel MESSAGE_LIMIT_CHANNEL
+                        Number of messages to be retrieved for channel.
+  --message_limit_group MESSAGE_LIMIT_GROUP
+                        Number of messages to be retrieved for group.
+  --message_limit_user MESSAGE_LIMIT_USER
+                        Number of messages to be retrieved for user and bot.
+  --date_start DATE_START
+                        YYYY-mm-dd format. Messages AFTER to this date will be
+                        retrieved. Inclusive.
+  --date_end DATE_END   YYYY-mm-dd format. Messages PREVIOUS to this date will
+                        be retrieved. Exclusive.
+#+END_SRC
+
+** Examples
+
+Search ~test~ in messages
+
+#+BEGIN_SRC bash
+$ python search.py --search_text='test'
+#+END_SRC
+
+Search ~test~ in messages but skip group and user/bot
+
+#+BEGIN_SRC bash
+$ python3 search.py --search_text='test' --skip_group=True --skip_user=True
+#+END_SRC
+
+Search ~test~ in messages started from 2022-07-11, include 2022-07-11.
+
+NOTE that timezone is UTC by default which might be different from your local.
+
+#+BEGIN_SRC bash
+$ python3 search.py --search_text='test' --date_start='2022-07-11'
+#+END_SRC
+
+Search ~test~ in messages between date [2022-07-11, 2022-07-13)
+
+#+BEGIN_SRC bash
+$ python3 search.py --search_text='test' --date_start='2022-07-11' --date_end='2022-07-13'
+#+END_SRC
