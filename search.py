@@ -35,7 +35,7 @@ def get_args():
     parser.add_argument('--skip_channel',
                         default=False, type=bool,
                         help='Whether to skip channel when search')
-    parser.add_argument('--skip_chat',
+    parser.add_argument('--skip_group',
                         default=False, type=bool,
                         help='Whether to skip group when search')
     parser.add_argument('--skip_user',
