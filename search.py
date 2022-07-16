@@ -42,6 +42,16 @@ def get_args():
                         default=False, type=bool,
                         help='Whether to skip user and bot when search')
 
+    parser.add_argument('--message_limit_channel',
+                        default=50, type=int,
+                        help='Number of messages to be retrieved for channel.')
+    parser.add_argument('--message_limit_group',
+                        default=50, type=int,
+                        help='Number of messages to be retrieved for group.')
+    parser.add_argument('--message_limit_user',
+                        default=50, type=int,
+                        help='Number of messages to be retrieved for user and bot.')
+
     args = parser.parse_args()
 
     return args
@@ -60,18 +70,21 @@ async def main():
         entity = dialog.entity
 
         if dialog.is_channel:
+            limit = args.message_limit_channel
             if args.skip_channel:
                 continue
         elif dialog.is_group:
+            limit = args.message_limit_group
             if args.skip_group:
                 continue
         else:
+            limit = args.message_limit_user
             if args.skip_user:
                 continue
 
         messages = await client.get_messages(
             entity,
-            limit=50,
+            limit=limit,
             offset_date=None,     # Offset date (messages previous to this date will be retrieved).
                                   # If None, from newest message. Exclusive.
             offset_id=0,          # Offset message ID (only messages previous to the given ID will be retrieved). Exclusive.
