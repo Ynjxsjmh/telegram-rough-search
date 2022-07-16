@@ -93,6 +93,7 @@ async def main():
 
         for message in messages_bar:
             if not isinstance(message, telethon.tl.patched.Message):
+                # skip some class like MessageService
                 continue
 
             if args.search_text in message.message:
