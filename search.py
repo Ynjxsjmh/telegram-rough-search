@@ -72,6 +72,7 @@ async def main():
     )
     dialogs_bar = tqdm(dialogs, bar_format='{desc} ({n_fmt}/{total_fmt})')
 
+    hit_count = 0
     for dialog in dialogs_bar:
         dialogs_bar.set_description_str(f'Searching in dialog: {dialog.name}')
         entity = dialog.entity
@@ -134,9 +135,13 @@ async def main():
                    or webpage.description and args.search_text in webpage.description:
                     logger.info(dialog.title + ' ' + message.date.strftime('%Y-%m-%d %H:%M:%S') )
                     logger.info(message.message + '\n')
+                    hit_count += 1
 
             messages_bar.update(1)
             sleep(0.005)
+
+    print(f'Search finished with {hit_count} results matched.')
+    print('Result is saved into search.log')
 
 client.start()
 client.loop.run_until_complete(main())
